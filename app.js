@@ -21,7 +21,9 @@ class PageRankApp {
             const response = await fetch('data/karate.csv');
             const csvText = await response.text();
             this.graph = this.parseCSVToGraph(csvText);
-            this.renderGraph();
+            // FIX: The renderGraph() method belongs to the graphRenderer object, not the PageRankApp class.
+// Calling the correct object to handle the visualization.
+            graphRenderer.renderGraph(this.graph);
             this.updateTable();
         } catch (error) {
             console.error('Error loading data:', error);
