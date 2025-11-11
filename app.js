@@ -7,6 +7,7 @@ class PageRankApp {
         this.isComputing = false;
         
         this.initializeEventListeners();
+        this.addTableSorting(); /** new **/
         this.loadDefaultData();
     }
 
@@ -14,6 +15,49 @@ class PageRankApp {
         document.getElementById('computeBtn').addEventListener('click', () => this.computePageRank());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGraph());
     }
+
+    /**
+ * Adds click event listeners to table headers for sorting.
+ */
+    addTableSorting() {
+    const headers = document.querySelectorAll('#tableHeader th');
+    // Keeps track of the current sort direction for each column ('asc' or 'desc')
+    let sortDirections = Array.from(headers).map(() => 'desc');
+
+    headers.forEach((header, index) => {
+        // We only sort the first two columns (ID and PageRank)
+        if (index > 1) return;
+
+        header.addEventListener('click', () => {
+            const tableBody = document.getElementById('tableBody');
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+            
+            // Toggle direction for the clicked column
+            const direction = sortDirections[index] === 'desc' ? 'asc' : 'desc';
+            sortDirections.fill('desc'); // Reset others
+            sortDirections[index] = direction;
+
+            const sortedRows = rows.sort((a, b) => {
+                // Get text content from the cells in the current column
+                let valA = a.children[index].textContent;
+                let valB = b.children[index].textContent;
+
+                // Convert to numbers for correct sorting
+                valA = parseFloat(valA) || 0; // Use 0 if 'N/A'
+                valB = parseFloat(valB) || 0;
+
+                // Compare values
+                if (valA < valB) return direction === 'asc' ? -1 : 1;
+                if (valA > valB) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Clear the table and append the newly sorted rows
+            tableBody.innerHTML = '';
+            sortedRows.forEach(row => tableBody.appendChild(row));
+        });
+    });
+}
 
     async loadDefaultData() {
         try {
